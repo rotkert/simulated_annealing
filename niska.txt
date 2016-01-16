@@ -1,0 +1,5 @@
+niska -11,6 krokow ok 9000  temp 10 -> 10^-20
+
+drugi (0,0) krokow 316 temp 10 -> 10^-6
+
+odchylenie: (0,0) krokow 450 temp 10 -> 10^-9, odchylenie 3, wzor w mianowniku 1 + exp
