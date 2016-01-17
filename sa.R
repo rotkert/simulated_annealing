@@ -80,7 +80,7 @@ metaheuristicRun<-function(initialization, startPoints, termination, evaluation)
     history<-historyPush(history,aa$newPoints)
     model<-aa$newModel
   }
-  #return(c(model$step, model$best))
+  # return(c(model$step, model$best))
   #write.csv(history, file="test.csv")
   
   
@@ -93,8 +93,7 @@ historyPush<-function(oldHistory, newPoints)
 {
   newHistory<-c(oldHistory,newPoints)
   return (newHistory)
-}
-#read a LIST of points pushed recently into the history
+}#read a LIST of points pushed recently into the history
 historyPop<-function(history, number)
 {
   stop=length(history)
@@ -119,13 +118,13 @@ initialization<-function(startPoints) {
 }
 
 initModel<-function(startPoints) {
-  model<-list(best = startPoints[[which.max(lapply(startPoints, function(x) x$quality))]], tempStart=10^10, step = 1)
+  model<-list(best = startPoints[[which.max(lapply(startPoints, function(x) x$quality))]], tempStart=1000, step = 1)
   model$temp<-model$tempStart
   return (model)
 }
 
 termination<-function(history,model) {
-  return (model$temp < 10^-100)
+  return (model$temp < 1)
 }
 
 #####################################################################
@@ -137,8 +136,9 @@ accept<- function (model, curr) {
 }
 
 processTemp<-function(model) {
- return (model$tempStart * (0.9^model$step))
-  #return (model$tempStart / log(model$step))
+ # return (model$tempStart * (0.9^model$step))
+  # return (model$tempStart / log(model$step))
+  return (model$tempStart / model$step)
   }
 
 #####################################################################
@@ -146,7 +146,7 @@ processTemp<-function(model) {
 #####################################################################
 
 square<-function(coordinates) {
-  return (-coordinates[[1]] * coordinates[[1]] + 10)
+  return (-coordinates[[1]] * coordinates[[1]] + 100)
 }
 
 himmel<-function(coordinates) {
@@ -176,6 +176,16 @@ shekel<-function(coordinates) {
   return(y)
 }
 
+rastr <- function(xx)
+{
+  d <- length(xx)
+  
+  sum <- sum(xx^2 - 10*cos(2*pi*xx))
+  
+  y <- -(10*d + sum)
+  return(y)
+}
+
 ######################################################################
 # start()
 ######################################################################
@@ -184,32 +194,37 @@ chart<-function(){
   history <- returnVal$history
   best<-returnVal$best
   
-  coordinates1 <- unlist(lapply(history, function(x) x$coordinates[[1]]))
-  coordinates2 <- unlist(lapply(history, function(x) x$coordinates[[2]]))
-  #quality <- unlist(lapply(history, function(x) x$quality))
-  df <- data.frame(coordinates1, coordinates2)
+  x <- unlist(lapply(history, function(x) x$coordinates[[1]]))
+  y <- unlist(lapply(history, function(x) x$coordinates[[2]]))
+  # quality <- unlist(lapply(history, function(x) x$quality))
+  df <- data.frame(x, y)
   library(plotly)
-  p<-plot_ly(df, x=coordinates1, y=coordinates2, name="Himmel", mode="markers", marker=list(color="red"))
+  p<-plot_ly(df, x=x, y=y, name="Square", mode="markers", marker=list(color="red"))
   add_trace(x=best$coordinates[[1]], y=best$coordinates[[2]], name="Best", marker = list(color="blue"))
   add_trace(x=history[[1]]$coordinates[[1]], y=history[[1]]$coordinates[[2]], name="First", marker = list(color="orange"))
 }
 
 best<-function() {
   bestList<-list()
-  for (k in 1:20) {
+  for (k in 1:15) {
     message(sprintf("coto"))
-    returnVal<-metaheuristicRun(initialization, list(c(-1000,5,2,1)), termination, shekel)
+    returnVal<-metaheuristicRun(initialization, list(c(10,12,2,8,9,4,3)), termination, rastr)
     bestList[[length(bestList) + 1]] <- returnVal$best
   }
   
-  x <- unlist(lapply(bestList, function(x) x$coordinates[[1]]))
-  y <- unlist(lapply(bestList, function(x) x$coordinates[[2]]))
-  z <- unlist(lapply(bestList, function(x) x$coordinates[[3]]))
-  s <- unlist(lapply(bestList, function(x) x$coordinates[[4]]))
-  value <- unlist(lapply(bestList, function(x) x$quality))
-  df<-data.frame(x,y,z,s,value)
-  write.xlsx(df, file = "shekel3.xlsx", sheetName = "temp10e3")
+  x1 <- sapply(bestList, function(x) x$coordinates[[1]])
+  x2 <- sapply(bestList, function(x) x$coordinates[[2]])
+  x3 <- sapply(bestList, function(x) x$coordinates[[3]])
+  x4 <- sapply(bestList, function(x) x$coordinates[[4]])
+  x5 <- sapply(bestList, function(x) x$coordinates[[5]])
+  x6 <- sapply(bestList, function(x) x$coordinates[[6]])
+  x7 <- sapply(bestList, function(x) x$coordinates[[7]])
+  quality <- sapply(bestList, function(x) x$quality)
+  df<-data.frame(x1,x2,x3,x4,x5,x6,x7, quality)
+  write.xlsx(df, file = "rastr3.xlsx")
 }
 
-metaheuristicRun(initialization, list(c(4,5,2,1)), termination, shekel)
+# chart()
+best()
+# metaheuristicRun(initialization, list(c(10,12,2,8,9,4,3)), termination, rastr)
 ####  THAT'S ALL FOLKS
