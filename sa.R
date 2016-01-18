@@ -80,11 +80,7 @@ metaheuristicRun<-function(initialization, startPoints, termination, evaluation)
     history<-historyPush(history,aa$newPoints)
     model<-aa$newModel
   }
-  # return(c(model$step, model$best))
-  #write.csv(history, file="test.csv")
   
-  
-  #write.csv(df, 'csv.csv')
   return (list (history = history, best = model$best))
 }
 
@@ -93,7 +89,9 @@ historyPush<-function(oldHistory, newPoints)
 {
   newHistory<-c(oldHistory,newPoints)
   return (newHistory)
-}#read a LIST of points pushed recently into the history
+}
+
+#read a LIST of points pushed recently into the history
 historyPop<-function(history, number)
 {
   stop=length(history)
@@ -136,10 +134,10 @@ accept<- function (model, curr) {
 }
 
 processTemp<-function(model) {
- # return (model$tempStart * (0.9^model$step))
+  # return (model$tempStart * (0.9^model$step))
   # return (model$tempStart / log(model$step))
   return (model$tempStart / model$step)
-  }
+}
 
 #####################################################################
 # Functions to optimize
@@ -207,7 +205,6 @@ chart<-function(){
 best<-function() {
   bestList<-list()
   for (k in 1:15) {
-    message(sprintf("coto"))
     returnVal<-metaheuristicRun(initialization, list(c(10,12,2,8,9,4,3)), termination, rastr)
     bestList[[length(bestList) + 1]] <- returnVal$best
   }
